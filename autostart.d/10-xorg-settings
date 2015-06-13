@@ -1,0 +1,9 @@
+#!/bin/sh
+
+xbindkeys
+xset -dpms
+xset s noblank
+xset s off
+xset s noexpose
+xset s 0 0
+xset m 3/2 0

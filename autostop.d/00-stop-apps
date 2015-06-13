@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# ==============
+# Close KeePassX
+# ==============
+
+KEEPASSX_LOCKFILE=$XDG_DATA_HOME/local/keepassx/smokybobodb.kdb.lock
+signals=(1 15 9)
+
+for SIG in $signals;
+do
+    KEEPASSX_PID=$(pgrep keepassx)
+    if [ -n "$KEEPASSX_PID" ]; then
+	kill -$SIG $KEEPASSX_PID
+    fi
+done
+
+KEEPASSX_PID=$(pgrep keepassx)
+if [ -z "$KEEPASSX_PID" ]; then
+    rm -f $KEEPASSX_LOCKFILE
+fi
+
+# ==============
+# 
+# ==============
