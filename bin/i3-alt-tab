@@ -86,11 +86,9 @@ class SwitchFocus:
         self.loop = asyncio.get_event_loop()
 
     def focus(self, conn, event):
-        print('Recording focus')
         win_id = event.container.props.id
         windows = self.windows
         self.windows = win = winprevcur(windows.cur, win_id)
-        print('Prev, cur: {}'.format(win))
 
     @asyncio.coroutine
     def command(self, cmd, socket_file):
