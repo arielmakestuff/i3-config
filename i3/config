@@ -51,10 +51,12 @@ bindsym $mod+r exec rofi -show run -bg "#222222" -fg "#888888" -hlbg "#285577" -
 bindsym $mod+Tab exec rofi -show window -bg "#222222" -fg "#888888" -hlbg "#285577" -hlfg "#ffffff"
 
 # change focus
-bindsym $mod+h focus left
-bindsym $mod+j focus down
-bindsym $mod+k focus up
-bindsym $mod+l focus right
+bindsym $mod+h unmark prevwin; mark prevwin; focus left
+bindsym $mod+j unmark prevwin; mark prevwin; focus down
+bindsym $mod+k unmark prevwin; mark prevwin; focus up
+bindsym $mod+l unmark prevwin; mark prevwin; focus right
+bindsym Mod1+Tab exec i3-alt-tab switch
+
 #  bindsym $mod+semicolon focus right
 
 # alternatively, you can use the cursor keys:
