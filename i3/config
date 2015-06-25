@@ -31,7 +31,7 @@ floating_modifier $mod
 
 # start a terminal
 #  bindsym $mod+Return exec i3-sensible-terminal
-bindsym $mod+Return unmark prevwin; mark prevwin; exec konsole
+bindsym $mod+Return exec konsole
 
 # kill focused window
 #  bindsym $mod+Shift+q kill
@@ -45,17 +45,18 @@ bindsym Control+Mod1+x kill
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 # installed.
 # bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
-bindsym $mod+r unmark prevwin; mark prevwin; exec rofi -show run -bg "#222222" -fg "#888888" -hlbg "#285577" -hlfg "#ffffff"
+bindsym $mod+r exec rofi -show run -bg "#222222" -fg "#888888" -hlbg "#285577" -hlfg "#ffffff"
 
 # Window switcher
-bindsym $mod+Tab unmark prevwin; mark prevwin; exec rofi -show window -bg "#222222" -fg "#888888" -hlbg "#285577" -hlfg "#ffffff"
+bindsym $mod+Tab exec rofi -show window -bg "#222222" -fg "#888888" -hlbg "#285577" -hlfg "#ffffff"
 
 # change focus
 bindsym $mod+h unmark prevwin; mark prevwin; focus left
 bindsym $mod+j unmark prevwin; mark prevwin; focus down
 bindsym $mod+k unmark prevwin; mark prevwin; focus up
 bindsym $mod+l unmark prevwin; mark prevwin; focus right
-bindsym Mod1+Tab mark curwin; [con_mark="prevwin"] focus; [con_mark="curwin"] mark prevwin; unmark curwin
+bindsym Mod1+Tab exec i3-alt-tab switch
+
 #  bindsym $mod+semicolon focus right
 
 # alternatively, you can use the cursor keys:
