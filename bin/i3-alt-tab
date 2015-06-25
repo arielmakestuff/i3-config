@@ -1,0 +1,164 @@
+#!/usr/bin/env python3
+
+import asyncio
+from os import path as op
+import os
+import sys
+from collections import namedtuple
+from functools import partial
+from argparse import ArgumentParser
+
+I3_PYDIR = op.join(os.environ['XDG_DATA_HOME'], 'i3', 'lib', 'python')
+sys.path.insert(1, I3_PYDIR)
+
+import i3ipc_async
+
+
+winprevcur = namedtuple('WinPrevCur', 'prev cur')
+RUNTIME_DIR = op.join(os.environ['XDG_RUNTIME_DIR'], 'i3')
+PIDFILE = op.join(RUNTIME_DIR, 'i3-alt-tab.pid')
+
+
+def current_con_id(conn):
+    """docstring for current_con_id"""
+    tree = conn.get_tree()
+    con_id = None
+
+    for con in tree.leaves():
+        if con.focused:
+            con_id = con.id
+            break
+    return con_id
+
+
+class Commands:
+
+    def __get__(self, obj, objtype):
+        self.server = obj
+        return self
+
+    @asyncio.coroutine
+    def shutdown(self):
+        future = asyncio.Future()
+
+        @asyncio.coroutine
+        def schedule_shutdown(future):
+            future.set_exception(SystemExit)
+
+        def stop_server(future):
+            raise future.exception()
+
+        future.add_done_callback(stop_server)
+        asyncio.ensure_future(schedule_shutdown(future))
+
+    def switch(self):
+        focus = self.server.focus
+        conn = focus.conn
+
+        tree = yield from conn.get_tree()
+
+        curwindows = set(w.id for w in tree.leaves())
+        prev_id, cur_id = focus.windows
+        if prev_id in curwindows:
+            yield from conn.command('[con_id={}] focus'.format(prev_id))
+        else:
+            focus.windows = winprevcur(cur_id, cur_id)
+
+
+class I3FocusServer(asyncio.Protocol):
+
+    def __init__(self, focus):
+        self.focus = focus
+
+    def data_received(self, data):
+        msg = data.decode()
+        cmd = getattr(self.commands, msg, lambda: None)
+        asyncio.ensure_future(cmd())
+
+    commands = Commands()
+
+
+class SwitchFocus:
+
+    def __init__(self):
+        self.windows = winprevcur(None, None)
+        self.conn = i3ipc_async.AsyncConnection()
+        self.loop = asyncio.get_event_loop()
+
+    def focus(self, conn, event):
+        print('Recording focus')
+        win_id = event.container.props.id
+        windows = self.windows
+        self.windows = win = winprevcur(windows.cur, win_id)
+        print('Prev, cur: {}'.format(win))
+
+    @asyncio.coroutine
+    def command(self, cmd, socket_file):
+        loop = self.loop
+        r, w = yield from asyncio.open_unix_connection(socket_file, loop=loop)
+        w.write(cmd.encode())
+        yield from w.drain()
+        w.close()
+
+    def focus_server(self):
+        loop = self.loop
+        conn = self.conn
+        conn.on('window::focus', self.focus)
+        pid = os.getpid()
+        socket_file = op.join(RUNTIME_DIR, 'i3-alt-tab.{}'.format(pid))
+        with open(PIDFILE, 'w') as f:
+            f.write(str(pid))
+        if op.exists(socket_file):
+            os.remove(socket_file)
+        coro = loop.create_unix_server(partial(I3FocusServer, self),
+                                       socket_file)
+        self.server = loop.run_until_complete(coro)
+
+        try:
+            loop.run_forever()
+        except (KeyboardInterrupt, SystemExit):
+            print('Shutting down...')
+        finally:
+            self.stop_server()
+
+    def stop_server(self):
+        loop = self.loop
+        if loop.is_closed():
+            return
+        server = self.server
+        server.close()
+        loop.run_until_complete(server.wait_closed())
+        pid = os.getpid()
+        socket_file = op.join(RUNTIME_DIR, 'i3-alt-tab.{}'.format(pid))
+        for fnam in [PIDFILE, socket_file]:
+            if op.exists(fnam):
+                os.remove(fnam)
+        self.conn.main_quit()
+        pending = asyncio.Task.all_tasks(loop=loop)
+        loop.run_until_complete(asyncio.gather(*pending, loop=loop))
+        loop.stop()
+        loop.close()
+
+    def run(self):
+        asyncio.ensure_future(self.conn.main(), loop=self.loop)
+        self.focus_server()
+
+
+def main():
+    parser = ArgumentParser(prog='i3-alt-tab.py')
+    parser.add_argument('command', metavar='cmd', nargs='?', default=None,
+                        help='Send command')
+    args = parser.parse_args()
+    focus = SwitchFocus()
+    if not args.command:
+        focus.run()
+    elif op.isfile(PIDFILE):
+        with open(PIDFILE) as f:
+            pid = f.read()
+        socket_file = op.join(RUNTIME_DIR, 'i3-alt-tab.{}'.format(pid))
+        focus.loop.run_until_complete(focus.command(args.command, socket_file))
+        focus.loop.close()
+
+
+if __name__ == '__main__':
+    main()
