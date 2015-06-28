@@ -70,6 +70,11 @@ def install_pylib(i3configdir, i3datadir):
     copytree(curlib, pylib)
 
 
+def format_index(lst, val, *format_vars):
+    index = lst.index(val)
+    lst[index] = lst[index].format(*format_vars)
+
+
 def install_i3ipc(i3configdir, i3datadir):
     i3tmpdir = op.join(i3configdir, 'tmp')
     if not op.isdir(i3tmpdir):
@@ -77,15 +82,19 @@ def install_i3ipc(i3configdir, i3datadir):
     wheelhouse = op.join(i3tmpdir, 'wheelhouse')
     if not op.isdir(wheelhouse):
         os.mkdir(wheelhouse)
+        print('Downloading: i3ipc python3-xlib')
         cmd = ('pip wheel --no-deps --wheel-dir={} '
-               'i3ipc python3-xlib'.format(wheelhouse))
-        check_output(cmd.split(' '))
+               'i3ipc python3-xlib').split(' ')
+        format_index(cmd, '--wheel-dir={}', wheelhouse)
+        check_output(cmd)
 
     print('Installing: i3ipc python3-xlib')
     pylibdir = op.join(i3datadir, 'lib', 'python')
-    cmd = ('pip install -t {} --no-deps --pre --use-wheel --no-index '
-           '--find-links={} i3ipc python3-xlib'.format(pylibdir, wheelhouse))
-    check_output(cmd.split(' '))
+    cmd = ('pip install --target={} --no-deps --pre --use-wheel --no-index '
+           '--find-links={} i3ipc python3-xlib').split(' ')
+    format_index(cmd, '--target={}', pylibdir)
+    format_index(cmd, '--find-links={}', wheelhouse)
+    check_output(cmd)
 
 
 def install_i3config(i3configdir, sysconfigdir):
