@@ -18,6 +18,7 @@ import os
 import os.path as op
 from contextlib import contextmanager
 from shutil import rmtree, copytree
+from subprocess import check_output
 
 
 # ============================================================================
@@ -65,8 +66,26 @@ def install_pylib(i3configdir, i3datadir):
     # Copy the python lib dir
     curlib = op.join(i3configdir, 'lib', 'python')
     pylib = op.join(libdir, 'python')
-    print('Installling: {}'.format(pylib))
+    print('Installing: {}'.format(pylib))
     copytree(curlib, pylib)
+
+
+def install_i3ipc(i3configdir, i3datadir):
+    i3tmpdir = op.join(i3configdir, 'tmp')
+    if not op.isdir(i3tmpdir):
+        os.mkdir(i3tmpdir)
+    wheelhouse = op.join(i3tmpdir, 'wheelhouse')
+    if not op.isdir(wheelhouse):
+        os.mkdir(wheelhouse)
+        cmd = ('pip wheel --no-deps --wheel-dir={} '
+               'i3ipc python3-xlib'.format(wheelhouse))
+        check_output(cmd.split(' '))
+
+    print('Installing: i3ipc python3-xlib')
+    pylibdir = op.join(i3datadir, 'lib', 'python')
+    cmd = ('pip install -t {} --no-deps --pre --use-wheel --no-index '
+           '--find-links={} i3ipc python3-xlib'.format(pylibdir, wheelhouse))
+    check_output(cmd.split(' '))
 
 
 def install_i3config(i3configdir, sysconfigdir):
@@ -91,6 +110,7 @@ def main():
     with cd(i3configdir):
         install_autodirs(i3configdir, i3datadir)
         install_pylib(i3configdir, i3datadir)
+        install_i3ipc(i3configdir, i3datadir)
         install_i3config(i3configdir, sysconfigdir)
 
 
