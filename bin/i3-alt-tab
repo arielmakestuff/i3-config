@@ -49,7 +49,7 @@ class Commands:
             raise future.exception()
 
         future.add_done_callback(stop_server)
-        asyncio.ensure_future(schedule_shutdown(future))
+        asyncio.async(schedule_shutdown(future))
 
     def switch(self):
         focus = self.server.focus
@@ -73,7 +73,7 @@ class I3FocusServer(asyncio.Protocol):
     def data_received(self, data):
         msg = data.decode()
         cmd = getattr(self.commands, msg, lambda: None)
-        asyncio.ensure_future(cmd())
+        asyncio.async(cmd())
 
     commands = Commands()
 
@@ -138,7 +138,7 @@ class SwitchFocus:
         loop.close()
 
     def run(self):
-        asyncio.ensure_future(self.conn.main(), loop=self.loop)
+        asyncio.async(self.conn.main(), loop=self.loop)
         self.focus_server()
 
 
