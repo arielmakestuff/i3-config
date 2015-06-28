@@ -1,4 +1,3 @@
 *.swp
 tmp/
-lib/
 __pycache__/
