@@ -181,16 +181,6 @@ bar
     status_command i3status
 }
 
-bar
-{
-    workspace_buttons no
-    mode dock
-    hidden_state show
-    position bottom
-    tray_output none
-    status_command $HOME/usr/bin/i3-conky
-}
-
 # Assign windows as scratchpad
 #  for_window [title=".* - KeePassX"] move scratchpad
 #  bindsym $mod+s scratchpad show
