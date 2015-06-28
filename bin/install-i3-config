@@ -1,0 +1,98 @@
+#!/usr/bin/env python3
+# Module: install-i3-config
+# Submodules: No
+# Created: Sat Jun 27, 2015
+# Copyright (C) 2015 Ariel De Ocampo
+#
+# This module is part of the install-i3-config project and is released under
+# the MIT License: http://opensource.org/licenses/mit-license.php
+"""
+"""
+
+# ============================================================================
+# Imports
+# ============================================================================
+
+import sys
+import os
+import os.path as op
+from contextlib import contextmanager
+from shutil import rmtree, copytree
+
+
+# ============================================================================
+#
+# ============================================================================
+
+
+@contextmanager
+def cd(path):
+    assert op.exists(path)
+    origdir = os.getcwd()
+    os.chdir(path)
+    yield
+    os.chdir(origdir)
+
+
+i3dir = lambda p: op.join(op.abspath(p), 'i3')
+
+
+def rmcurdir(path, name):
+    """Remove subfile from path"""
+    curfile = op.join(path, name)
+    print('Removing: {}'.format(curfile))
+    if not op.islink(curfile) and op.isdir(curfile):
+        rmtree(curfile)
+    elif op.exists(curfile):
+        os.remove(curfile)
+    return curfile
+
+
+def install_autodirs(i3configdir, i3datadir):
+    for dirtype in ['start', 'stop']:
+        autodir = 'auto{}.d'.format(dirtype)
+        dest = rmcurdir(i3datadir, autodir)
+        print('Installing: {}'.format(dest))
+        copytree(op.join(i3configdir, autodir), dest)
+
+
+def install_pylib(i3configdir, i3datadir):
+    libdir = rmcurdir(i3datadir, 'lib')
+
+    # Create a new libdir
+    os.mkdir(libdir)
+
+    # Copy the python lib dir
+    curlib = op.join(i3configdir, 'lib', 'python')
+    pylib = op.join(libdir, 'python')
+    print('Installling: {}'.format(pylib))
+    copytree(curlib, pylib)
+
+
+def install_i3config(i3configdir, sysconfigdir):
+    for name in ['i3', 'i3status']:
+        confdir = rmcurdir(sysconfigdir, name)
+        print('Installing: {}'.format(confdir))
+        copytree(op.join(i3configdir, name), confdir)
+
+
+def main():
+    # Get i3-config directory
+    i3configdir = op.abspath(sys.argv[0])
+    for i in range(2):
+        i3configdir = op.dirname(i3configdir)
+
+    # Get $XDG_DATA_HOME i3 dir
+    i3datadir = i3dir(os.environ['XDG_DATA_HOME'])
+
+    # Get $XDG_CONFIG_HOME
+    sysconfigdir = op.abspath(os.environ['XDG_CONFIG_HOME'])
+
+    with cd(i3configdir):
+        install_autodirs(i3configdir, i3datadir)
+        install_pylib(i3configdir, i3datadir)
+        install_i3config(i3configdir, sysconfigdir)
+
+
+if __name__ == '__main__':
+    main()
