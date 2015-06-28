@@ -51,6 +51,7 @@ class Commands:
         future.add_done_callback(stop_server)
         asyncio.async(schedule_shutdown(future))
 
+    @asyncio.coroutine
     def switch(self):
         focus = self.server.focus
         conn = focus.conn
