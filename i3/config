@@ -39,6 +39,9 @@ bindsym $mod+Return exec konsole
 # Custom = Control+Alt+x
 bindsym Control+Mod1+x kill
 
+# Unmap focused window
+bindsym Control+Mod1+w exec xdotool getwindowfocus -f windowunmap
+
 # start dmenu (a program launcher)
 #  bindsym $mod+d exec dmenu_run
 # There also is the (new) i3-dmenu-desktop which only displays applications
