@@ -1,1 +1,5 @@
 #!/bin/bash
+# Example shutdown applications
+
+# Shutdown focus switcher
+# i3-alt-tab shutdown
