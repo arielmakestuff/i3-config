@@ -1,3 +1,11 @@
 #!/bin/sh
+# Following are example programs
 
-#feh --bg-center <image file>
+# Compositer
+# compton -CG --backend glx --vsync opengl-swc &
+
+# Background picture
+# feh --bg-center <image file>
+
+# Run focus switcher server
+# i3-alt-tab &
