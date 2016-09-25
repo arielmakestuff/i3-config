@@ -1,24 +1,4 @@
 #!/bin/bash
+# Below are examples of startup applications
 
-KEEPASSXDB=/home/smokybobo/.local/share/local/keepassx/smokybobodb.kdb
-SSH_KEY=$HOME/.ssh/id_rsa
-SSH_ADD="/usr/bin/ssh-add $SSH_KEY"
-
-# Add ssh key
-# add_id
-
-# retrain-email.sh &
-# konsole -e sh-ssh-askpass &
-
-# Start password managers
-keepassx $KEEPASSXDB &
-sleep 1
-xdotool search --name "$KEEPASSXDB" windowactivate --sync type "$(pass show system/keepassx)"
-xdotool search --name "$KEEPASSXDB" windowactivate --sync key Return
-sleep 1
-xdotool search --name "$KEEPASSXDB - KeePassX" windowminimize
-
-kmix &
-icedove &
-launchy &
-wmctrl -x -c keepassx
+# kmix &

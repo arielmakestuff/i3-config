@@ -1,3 +1,11 @@
 #!/bin/sh
+# Following are example programs
 
-feh --bg-center "$HOME/opt/pictures/anime/Haibane Renmei/02_11.jpg"
+# Compositer
+# compton -CG --backend glx --vsync opengl-swc &
+
+# Background picture
+# feh --bg-center <image file>
+
+# Run focus switcher server
+# i3-alt-tab &
