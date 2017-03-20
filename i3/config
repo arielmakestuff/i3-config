@@ -33,6 +33,7 @@ floating_modifier $mod
 #  bindsym $mod+Return exec i3-sensible-terminal
 # bindsym $mod+Return exec "gnome-terminal --hide-menubar"
 bindsym $mod+Return exec "konsole"
+# bindsym $mod+Return exec "qterminal"
 
 # kill focused window
 #  bindsym $mod+Shift+q kill
@@ -49,7 +50,6 @@ bindsym Control+Mod1+w exec xdotool getwindowfocus -f windowunmap
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 # installed.
 # bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
-#
 bindsym $mod+r exec "rofi -show run -color-enabled -color-normal '#222222,#888888,#222222,#285577,#ffffff' -color-window '#222222' -color-urgent '#222222,#888888,#222222,#285577,#ffffff' -color-active '#222222,#888888,#222222,#285577,#ffffff'"
 
 # Window switcher
@@ -129,6 +129,10 @@ bindsym $mod+8 workspace 8
 bindsym $mod+9 workspace 9
 bindsym $mod+0 workspace 10
 
+# Switch to next/prev workspace
+bindsym $mod+Control+Right workspace next
+bindsym $mod+Control+Left workspace prev
+
 # move focused container to workspace
 bindsym $mod+Shift+1 move container to workspace 1
 bindsym $mod+Shift+2 move container to workspace 2
@@ -183,7 +187,7 @@ bar
     mode dock
     hidden_state show
     position top
-    status_command i3status
+    status_command /usr/bin/i3status
 }
 
 bar
@@ -193,7 +197,7 @@ bar
     hidden_state show
     position bottom
     tray_output none
-    status_command $HOME/usr/bin/i3-conky
+    status_command $HOME/.local/bin/i3-conky
 }
 
 # Assign windows as scratchpad
