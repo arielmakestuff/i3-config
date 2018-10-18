@@ -260,6 +260,7 @@ bar
     hidden_state show
     position top
     status_command /usr/bin/i3status
+    # tray_output DisplayPort-2
 }
 
 bar
@@ -272,9 +273,24 @@ bar
     status_command $HOME/.local/bin/i3-conky
 }
 
+# Set workspaces to be on specific monitors
+# workspace 1-1 output DisplayPort-3
+# workspace 1-2 output DisplayPort-3
+# workspace 1-3 output DisplayPort-3
+# workspace 1-4 output DisplayPort-3
+# workspace 1-5 output DisplayPort-3
+# workspace 1-6 output DisplayPort-3
+# workspace 1-7 output DisplayPort-3
+# workspace 1-8 output DisplayPort-3
+# workspace 1-9 output DisplayPort-3
+# workspace 1-10 output DisplayPort-3
+
 # Assign windows as scratchpad
 #  for_window [title=".* - KeePassX"] move scratchpad
 #  bindsym $mod+s scratchpad show
+
+# Assign windows to start in a specific monitor
+# assign [class="^Firefox$"] 10
 
 # Autostart apps
 exec "run-parts $XDG_DATA_HOME/i3/autostart.d"
